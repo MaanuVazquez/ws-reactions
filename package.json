@@ -1,0 +1,50 @@
+{
+  "name": "ws-reactions",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node -r ./tsconfig-paths-bootstrap.js build/index.js",
+    "docker-start": "make docker-start",
+    "docker-stop": "make docker-stop",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint ./src --ext ts && tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "description": "",
+  "devDependencies": {
+    "@graphql-codegen/cli": "^1.13.2",
+    "@graphql-codegen/typescript-graphql-files-modules": "^1.13.2",
+    "@types/dotenv": "^8.2.0",
+    "@types/mongoose": "^5.7.36",
+    "@types/node": "^13.11.0",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.25.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-prettier": "^3.1.2",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "prettier": "^2.0.2",
+    "ts-loader": "^6.2.2",
+    "ts-node": "^8.8.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "apollo-server": "^2.12.0",
+    "dotenv": "^8.2.0",
+    "graphql": "^14.1.1",
+    "merge-graphql-schemas": "^1.7.7",
+    "mongoose": "^5.9.28",
+    "nodemon": "^2.0.2",
+    "tsconfig-paths": "^3.9.0",
+    "uuidv4": "^6.2.2"
+  }
+}

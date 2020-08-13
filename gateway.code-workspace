@@ -1,0 +1,11 @@
+{
+  "folders": [
+    {
+      "path": "/Users/marianomangialavori/turnero/turnero-monorepo/packages/gateway"
+    }
+  ],
+  "settings": {
+    "eslint.workingDirectories": [{ "mode": "auto" }],
+    "tslint.enable": false
+  }
+}

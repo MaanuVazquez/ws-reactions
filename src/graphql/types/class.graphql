@@ -1,0 +1,11 @@
+type Reaction {
+  id: ID!
+  reaction: String!
+  time: Int
+  classId: ID!
+}
+
+type ReactionClass {
+  id: ID!
+  reactions: [Reaction]
+}
