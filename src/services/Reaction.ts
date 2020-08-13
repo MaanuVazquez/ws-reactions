@@ -1,19 +1,21 @@
-import mongoose, { Mongoose, Model } from 'mongoose'
+import mongoose, { Mongoose, Model, Schema } from 'mongoose'
 import { uuid } from 'uuidv4'
 
 const REACTIONS = ['clap', 'heart', 'muscle']
 
 const Class = new mongoose.Schema({
   id: String,
-  reactions: {
-    type: String,
-    ref: 'Reaction'
-  }
+  reactions: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Reaction'
+    }
+  ]
 })
 
 const Reaction = new mongoose.Schema({
   id: String,
-  type: String,
+  reaction: String,
   time: Number,
   classId: {
     type: String,
@@ -40,13 +42,13 @@ export default class ReactionService {
     mongoose.connect('mongodb://localhost/reaction', { useNewUrlParser: true }).then(m => {
       this.mongoose = m
       this.mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
-      this.ClassModel = this.mongoose.model('Class', Class)
-      this.ClassModel = this.mongoose.model('Reaction', Reaction)
+      this.ClassModel = this.mongoose.model('Class', Class, 'classes')
+      this.ReactionModel = this.mongoose.model('Reaction', Reaction, 'reactions')
     })
   }
 
   async react(classId: string, reaction: string, time?: number): Promise<void> {
-    if (!REACTIONS.includes(reaction.toLowerCase()) || !this.ReactionModel) return
+    if (!REACTIONS.includes(reaction.toLowerCase()) || !this.ReactionModel || !this.ClassModel) return
 
     const newReaction = new this.ReactionModel({
       id: uuid(),
@@ -56,13 +58,20 @@ export default class ReactionService {
     })
     await newReaction.save()
 
+    const classModified = await this.ClassModel.findOne({ id: classId })
+    classModified.reactions.push(newReaction)
+    await classModified.save()
+
     return newReaction
   }
 
   async getClass(id: string): Promise<void> {
     if (!this.ClassModel) return
     const reactionClass = await this.ClassModel.findOne({ id }).populate('reactions')
-    if (reactionClass) return reactionClass
+    if (reactionClass) {
+      console.log(reactionClass)
+      return reactionClass
+    }
 
     const newReactionClass = new this.ClassModel({
       id
