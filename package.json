@@ -6,8 +6,9 @@
   "private": false,
   "scripts": {
     "dev": "nodemon",
-    "build": "tsc",
+    "build": "tsc; mkdir -p ./build/graphql/types; cp -r ./src/graphql/types/*.graphql ./build/graphql/types",
     "start": "node -r ./tsconfig-paths-bootstrap.js build/index.js",
+    "docker-build": "make docker-build",
     "docker-start": "make docker-start",
     "docker-stop": "make docker-stop",
     "test": "echo \"Error: no test specified\" && exit 1",

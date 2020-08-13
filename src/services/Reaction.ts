@@ -39,12 +39,21 @@ export default class ReactionService {
   ReactionModel: Model<any> | null = null
 
   constructor() {
-    mongoose.connect('mongodb://localhost/reaction', { useNewUrlParser: true }).then(m => {
-      this.mongoose = m
-      this.mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
-      this.ClassModel = this.mongoose.model('Class', Class, 'classes')
-      this.ReactionModel = this.mongoose.model('Reaction', Reaction, 'reactions')
-    })
+    const connectToMongo = (): void => {
+      mongoose
+        .connect('mongodb://mongo:27017/reaction', { useNewUrlParser: true })
+        .then(m => {
+          this.mongoose = m
+          this.mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
+          this.ClassModel = this.mongoose.model('Class', Class, 'classes')
+          this.ReactionModel = this.mongoose.model('Reaction', Reaction, 'reactions')
+        })
+        .catch(() => {
+          console.log('trying to connect to mongo…')
+          setTimeout(connectToMongo, 5000)
+        })
+    }
+    connectToMongo()
   }
 
   async react(classId: string, reaction: string, time?: number): Promise<void> {
