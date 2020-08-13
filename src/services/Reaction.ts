@@ -1,27 +1,7 @@
-import mongoose, { Mongoose, Model, Schema } from 'mongoose'
+import mongoose, { Mongoose, Model } from 'mongoose'
 import { uuid } from 'uuidv4'
-
-const REACTIONS = ['clap', 'heart', 'muscle']
-
-const Class = new mongoose.Schema({
-  id: String,
-  reactions: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'Reaction'
-    }
-  ]
-})
-
-const Reaction = new mongoose.Schema({
-  id: String,
-  reaction: String,
-  time: Number,
-  classId: {
-    type: String,
-    ref: 'Class'
-  }
-})
+import { ClassSchema, ReactionSchema } from '../schema'
+import { ALLOWED_REACTIONS } from 'schema/Reaction'
 
 let instance: ReactionService | null = null
 
@@ -40,13 +20,15 @@ export default class ReactionService {
 
   constructor() {
     const connectToMongo = (): void => {
+      const connectionString =
+        process.env.NODE_ENV === 'development' ? 'mongodb://localhost/reaction' : 'mongodb://mongo:27017/reaction'
       mongoose
-        .connect('mongodb://mongo:27017/reaction', { useNewUrlParser: true })
+        .connect(connectionString, { useNewUrlParser: true })
         .then(m => {
           this.mongoose = m
           this.mongoose.connection.on('error', console.error.bind(console, 'connection error:'))
-          this.ClassModel = this.mongoose.model('Class', Class, 'classes')
-          this.ReactionModel = this.mongoose.model('Reaction', Reaction, 'reactions')
+          this.ClassModel = this.mongoose.model('Class', ClassSchema, 'classes')
+          this.ReactionModel = this.mongoose.model('Reaction', ReactionSchema, 'reactions')
         })
         .catch(() => {
           console.log('trying to connect to mongo…')
@@ -56,13 +38,13 @@ export default class ReactionService {
     connectToMongo()
   }
 
-  async react(classId: string, reaction: string, time?: number): Promise<void> {
-    if (!REACTIONS.includes(reaction.toLowerCase()) || !this.ReactionModel || !this.ClassModel) return
+  async react(classId: string, reaction: string, segmentIndex: number): Promise<void> {
+    if (!ALLOWED_REACTIONS.includes(reaction.toLowerCase()) || !this.ReactionModel || !this.ClassModel) return
 
     const newReaction = new this.ReactionModel({
       id: uuid(),
       reaction,
-      time,
+      segmentIndex,
       classId
     })
     await newReaction.save()
@@ -77,8 +59,8 @@ export default class ReactionService {
   async getClass(id: string): Promise<void> {
     if (!this.ClassModel) return
     const reactionClass = await this.ClassModel.findOne({ id }).populate('reactions')
+
     if (reactionClass) {
-      console.log(reactionClass)
       return reactionClass
     }
 
@@ -86,7 +68,20 @@ export default class ReactionService {
       id
     })
     await newReactionClass.save()
+    await this.generateRandomReacts(newReactionClass.id)
 
-    return newReactionClass
+    return this.ClassModel.findOne({ id }).populate('reactions')
+  }
+
+  async generateRandomReacts(classId: string): Promise<void[]> {
+    const reactsToCreate = Math.floor(Math.random() * 40) + 1
+    const reactType = ALLOWED_REACTIONS[Math.floor(Math.random() * 3)]
+    const reactSegment = Math.round(Math.random())
+
+    return Promise.all(
+      Array.from(Array(reactsToCreate), () => {
+        return this.react(classId, reactType, reactSegment)
+      })
+    )
   }
 }

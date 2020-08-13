@@ -1,11 +1,19 @@
 type Reaction {
   id: ID!
   reaction: String!
-  time: Int
+  segmentIndex: Int!
   classId: ID!
+}
+
+type TotalReactions {
+  persevere: Int!
+  relaxed: Int!
+  tired: Int!
 }
 
 type ReactionClass {
   id: ID!
-  reactions: [Reaction]
+  reactions: [Reaction]!
+  totalReactions: TotalReactions!
+  reactionsBySegment: [TotalReactions]!
 }

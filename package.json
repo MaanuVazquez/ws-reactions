@@ -5,9 +5,9 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "dev": "nodemon",
+    "dev": "NODE_ENV=development nodemon",
     "build": "tsc; mkdir -p ./build/graphql/types; cp -r ./src/graphql/types/*.graphql ./build/graphql/types",
-    "start": "node -r ./tsconfig-paths-bootstrap.js build/index.js",
+    "start": "NODE_ENV=production node -r ./tsconfig-paths-bootstrap.js build/index.js",
     "docker-build": "make docker-build",
     "docker-start": "make docker-start",
     "docker-stop": "make docker-stop",

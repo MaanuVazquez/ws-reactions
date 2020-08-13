@@ -1,10 +1,8 @@
 import pubsub, { CLASS_REACTED } from '../pubsub'
 
-async function react(_: unknown, { classId, reaction }: any, ctx: any): Promise<any> {
-  console.log('asd')
-  const result = await ctx.reaction.react(classId, reaction)
+async function react(_: unknown, { classId, reaction, segmentIndex }: any, ctx: any): Promise<any> {
+  const result = await ctx.reaction.react(classId, reaction, segmentIndex)
   pubsub.publish(CLASS_REACTED, { classReacted: result })
-  console.log(result)
   return result
 }
 
